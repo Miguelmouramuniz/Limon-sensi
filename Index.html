@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Limon Sensi AI – Oficial</title>
+
+<!-- Fonte Futurista -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Orbitron',sans-serif;
+  color:#39ff14;
+  background:linear-gradient(-45deg,#000,#0a0a0a,#1a1a1a,#39ff14);
+  background-size:400% 400%;
+  animation:aurora 10s ease infinite,entrada 1.2s ease-out;
+  overflow-x:hidden;
+}
+@keyframes aurora{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+@keyframes entrada{
+from{opacity:0;transform:translateY(60px);}
+to{opacity:1;transform:translateY(0);}
+}
+header{
+text-align:center;
+padding:30px;
+font-size:32px;
+font-weight:bold;
+text-shadow:0 0 30px #39ff14;
+}
+.container{
+max-width:1000px;
+margin:auto;
+padding:25px;
+}
+.card{
+background:rgba(0,0,0,0.85);
+padding:30px;
+border-radius:25px;
+box-shadow:0 0 35px #39ff14;
+margin-bottom:30px;
+}
+h2{margin-bottom:15px;}
+label{display:block;margin-top:15px;margin-bottom:5px;}
+select,input{
+width:100%;
+padding:14px;
+background:#111;
+border:1px solid #39ff14;
+border-radius:15px;
+color:#39ff14;
+font-family:'Orbitron',sans-serif;
+margin-bottom:10px;
+}
+.lista-modelos{
+max-height:180px;
+overflow-y:auto;
+background:#0a0a0a;
+border-radius:15px;
+margin-bottom:15px;
+}
+.modelo-item{
+padding:10px;
+cursor:pointer;
+border-bottom:1px solid rgba(57,255,20,0.2);
+}
+.modelo-item:hover{
+background:rgba(57,255,20,0.1);
+}
+.detect-box{
+margin-top:20px;
+border:2px dashed #39ff14;
+padding:60px;
+border-radius:20px;
+text-align:center;
+cursor:pointer;
+}
+.resultado{
+background:#0a0a0a;
+padding:25px;
+border-radius:20px;
+margin-top:20px;
+box-shadow:0 0 20px #39ff14;
+}
+.barra{
+height:15px;
+background:#222;
+border-radius:20px;
+margin-top:15px;
+}
+.barra-fill{
+height:15px;
+background:#39ff14;
+border-radius:20px;
+width:0%;
+transition:0.5s;
+box-shadow:0 0 15px #39ff14;
+}
+button{
+width:100%;
+margin-top:20px;
+padding:16px;
+background:#39ff14;
+border:none;
+border-radius:20px;
+font-family:'Orbitron',sans-serif;
+font-weight:bold;
+color:#000;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 0 25px #39ff14;
+}
+button:hover{
+transform:scale(1.03);
+box-shadow:0 0 40px #39ff14;
+}
+</style>
+</head>
+<body>
+
+<header>🍋 LIMON SENSI AI – OFICIAL 🍋</header>
+
+<div class="container">
+<div class="card">
+
+<h2>🔍 Selecione a Marca</h2>
+<select id="marca" onchange="carregarModelos()">
+  <option value="">Selecione</option>
+  <option value="Samsung">Samsung</option>
+  <option value="Xiaomi">Xiaomi</option>
+  <option value="iPhone">iPhone</option>
+  <option value="Poco">Poco</option>
+  <option value="Infinix">Infinix</option>
+</select>
+
+<label>Pesquisar Modelo</label>
+<input type="text" id="pesquisa" placeholder="Digite seu modelo..." onkeyup="filtrarModelos()">
+<div id="listaModelos" class="lista-modelos"></div>
+
+<label>Tipo de Sensibilidade</label>
+<select id="tipo">
+<option value="baixa">Baixa</option>
+<option value="media">Média</option>
+<option value="alta">Alta</option>
+</select>
+
+<label>Sua sensi está:</label>
+<select id="estado">
+<option value="normal">Normal</option>
+<option value="pesada">Pesada Demais</option>
+<option value="leve">Leve Demais</option>
+</select>
+
+<label>Modo DPI</label>
+<select id="modoDpi">
+<option value="com">Com DPI</option>
+<option value="sem">Sem DPI</option>
+</select>
+
+<div class="detect-box" id="detector">
+👆 Toque e arraste aqui
+</div>
+
+<div id="resultado"></div>
+
+<div class="barra">
+<div class="barra-fill" id="barra"></div>
+</div>
+
+<button onclick="abrirFreeFire()">🔥 ABRIR FREE FIRE</button>
+
+</div>
+</div>
+
+<script>
+/* ===== BANCO DE DADOS COMPLETO ===== */
+const celulares = {
+  Samsung:[
+    {modelo:"Galaxy A14", ram:4, resolucao:"2408x1080", categoria:"medio"},
+    {modelo:"Galaxy A54", ram:8, resolucao:"2340x1080", categoria:"forte"},
+    {modelo:"Galaxy S23", ram:8, resolucao:"2340x1080", categoria:"gamer"}
+  ],
+  Xiaomi:[
+    {modelo:"Redmi 12", ram:4, resolucao:"2460x1080", categoria:"medio"},
+    {modelo:"Redmi 13", ram:8, resolucao:"2400x1080", categoria:"forte"},
+    {modelo:"Redmi Note 13", ram:8, resolucao:"2400x1080", categoria:"forte"}
+  ],
+  iPhone:[
+    {modelo:"iPhone 11", ram:4, resolucao:"1792x828", categoria:"forte"},
+    {modelo:"iPhone 13", ram:4, resolucao:"2532x1170", categoria:"forte"},
+    {modelo:"iPhone 15", ram:6, resolucao:"2556x1179", categoria:"gamer"}
+  ],
+  Poco:[
+    {modelo:"Poco X4 Pro", ram:8, resolucao:"2400x1080", categoria:"forte"},
+    {modelo:"Poco F4", ram:8, resolucao:"2400x1080", categoria:"gamer"}
+  ],
+  Infinix:[
+    {modelo:"Note 30", ram:8, resolucao:"2460x1080", categoria:"forte"},
+    {modelo:"GT 10 Pro", ram:8, resolucao:"2400x1080", categoria:"gamer"}
+  ]
+};
+
+/* ===== FILTRO E SELEÇÃO ===== */
+let modelosAtuais = [];
+let modeloSelecionado = "";
+
+function carregarModelos(){
+  const marca = document.getElementById("marca").value;
+  modelosAtuais = celulares[marca] || [];
+  document.getElementById("pesquisa").value = "";
+  document.getElementById("listaModelos").innerHTML = "";
+}
+
+function filtrarModelos(){
+  const input = document.getElementById("pesquisa").value.toLowerCase();
+  const lista = document.getElementById("listaModelos");
+  lista.innerHTML="";
+  modelosAtuais
+    .filter(m => m.modelo.toLowerCase().includes(input))
+    .forEach(m=>{
+      const div = document.createElement("div");
+      div.className="modelo-item";
+      div.innerText = m.modelo;
+      div.onclick=function(){
+        modeloSelecionado=m.modelo;
+        document.getElementById("pesquisa").value = m.modelo;
+        lista.innerHTML="";
+      };
+      lista.appendChild(div);
+    });
+}
+
+/* ===== DETECTOR DE TOQUE ===== */
+let inicio, movimentos = [];
+const detector=document.getElementById("detector");
+
+detector.addEventListener("mousedown",()=>{movimentos=[];inicio=performance.now();});
+detector.addEventListener("touchstart",()=>{movimentos=[];inicio=performance.now();});
+detector.addEventListener("mousemove",()=>movimentos.push(performance.now()));
+detector.addEventListener("touchmove",()=>movimentos.push(performance.now()));
+detector.addEventListener("mouseup",finalizar);
+detector.addEventListener("touchend",finalizar);
+
+/* ===== CALCULO DE SENSI ===== */
+function finalizar(){
+  const tipo=document.getElementById("tipo").value;
+  const estado=document.getElementById("estado").value;
+  const modoDpi=document.getElementById("modoDpi").value;
+  const estabilidade = movimentos.length;
+  let base=160;
+
+  // Ajuste por tipo
+  if(tipo==="baixa") base=140;
+  if(tipo==="media") base=170;
+  if(tipo==="alta") base=190;
+
+  // Ajuste por modelo
+  let celularInfo = modelosAtuais.find(c => c.modelo===modeloSelecionado);
+  if(celularInfo){
+    if(celularInfo.categoria==="forte") base+=5;
+    if(celularInfo.categoria==="gamer") base+=10;
+  }
+
+  // Ajuste por estado
+  if(estado==="pesada") base+=15;
+  if(estado==="leve") base-=15;
+  if(estabilidade>30) base+=5;
+
+  const geral = Math.max(100, Math.min(base,200));
+  const vermelho = geral-5;
+  const mira2x = Math.max(180, geral+10);
+  const mira4x = Math.max(185, geral+15);
+
+  let dpi="";
+  if(modoDpi==="com"){
+    if(estado==="pesada") dpi="900";
+    else if(estado==="leve") dpi="500";
+    else dpi="650";
+  }
+
+  const botao=estabilidade<20?30:estabilidade<40?38:45;
+  const memoria=navigator.deviceMemory || "Não detectada";
+  const largura=screen.width;
+  const altura=screen.height;
+  let nivelToque="Médio";
+  if(estabilidade<15) nivelToque="Leve";
+  if(estabilidade>35) nivelToque="Alto";
+
+  document.getElementById("resultado").innerHTML=`
+    <div class="resultado">
+      <p>📱 Modelo: ${modeloSelecionado || "Não informado"}</p>
+      <p>RAM: ${memoria} GB</p>
+      <p>Resolução: ${largura} x ${altura}</p>
+      <p>Nível de Toque: ${nivelToque}</p>
+      <p>🎯 Geral: ${geral}</p>
+      <p>🔴 Ponto Vermelho: ${vermelho}</p>
+      <p>🔭 Mira 2x: ${mira2x}</p>
+      <p>🔭 Mira 4x: ${mira4x}</p>
+      <p>🔘 Botão: ${botao}</p>
+      ${modoDpi==="com"?`<p>⚙ DPI: ${dpi}</p>`:""}
+    </div>
+  `;
+  document.getElementById("barra").style.width=(geral/2)+"%";
+}
+
+/* ===== ABRIR FREE FIRE ===== */
+function abrirFreeFire(){
+  window.location.href="freefire://open";
+  setTimeout(()=>{window.location.href="https://play.google.com/store/apps/details?id=com.dts.freefireth";},2000);
+}
+</script>
+
+</body>
+  </html>
